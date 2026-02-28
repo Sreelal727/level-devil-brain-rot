@@ -38,9 +38,9 @@ const LEVEL_04 = {
     ],
 
     walls: [
-        // Corridor walls
-        { x: 550, y: 550, height: 150, id: 'w1' },
-        { x: 950, y: 400, height: 200, id: 'w2' },
+        // Corridor walls - gaps at bottom for player to pass
+        { x: 550, y: 500, height: 120, id: 'w1' },
+        { x: 950, y: 300, height: 150, id: 'w2' },
     ],
 
     hazards: [
@@ -64,9 +64,9 @@ const LEVEL_04 = {
                     { x: 1006, y: 464, direction: 'up' },
                     { x: 1022, y: 464, direction: 'up' },
                     { x: 1038, y: 464, direction: 'up' },
-                    // Wall spikes
-                    { x: 566, y: 520, direction: 'right' },
-                    { x: 566, y: 540, direction: 'right' },
+                    // Wall spikes (on right side of w1)
+                    { x: 566, y: 470, direction: 'right' },
+                    { x: 566, y: 490, direction: 'right' },
                     // Near door
                     { x: 1520, y: 134, direction: 'up' },
                     { x: 1536, y: 134, direction: 'up' },
