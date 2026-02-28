@@ -40,7 +40,7 @@ const LEVEL_01 = {
 
     walls: [
         // Corridor walls to force routing
-        { x: 700, y: 250, height: 200, id: 'wall1' },
+        { x: 700, y: 220, height: 200, id: 'wall1' },
     ],
 
     hazards: [
