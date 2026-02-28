@@ -69,6 +69,14 @@ class GameScene extends Phaser.Scene {
         // Trolls
         this.trollManager.init(this.levelConfig);
 
+        // Analytics: track level start
+        if (typeof gtag === 'function') {
+            gtag('event', 'level_start', {
+                level_name: this.levelConfig.name,
+                level_number: this.levelIndex + 1,
+            });
+        }
+
         // HUD (fixed to camera)
         this.levelText = this.add.text(GAME.WIDTH / 2, 20, this.levelConfig.name, {
             fontFamily: 'Courier New',
@@ -143,15 +151,34 @@ class GameScene extends Phaser.Scene {
     }
 
     onQuestionCorrect() {
+        if (typeof gtag === 'function') {
+            gtag('event', 'level_end', {
+                level_name: this.levelConfig.name,
+                level_number: this.levelIndex + 1,
+                success: true,
+            });
+        }
         LevelRegistry.saveProgress(this.levelIndex);
         this.scene.start('LevelCompleteScene', { level: this.levelIndex });
     }
 
     onQuestionWrong() {
+        if (typeof gtag === 'function') {
+            gtag('event', 'question_wrong', {
+                level_name: this.levelConfig.name,
+                level_number: this.levelIndex + 1,
+            });
+        }
         this.scene.start('GameOverScene', { level: this.levelIndex, reason: 'question' });
     }
 
     onPlayerDeath() {
+        if (typeof gtag === 'function') {
+            gtag('event', 'player_death', {
+                level_name: this.levelConfig.name,
+                level_number: this.levelIndex + 1,
+            });
+        }
         this.shakeCamera(0.01, 300);
         this.time.delayedCall(500, () => {
             this.scene.start('GameOverScene', { level: this.levelIndex, reason: 'death' });
