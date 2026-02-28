@@ -1,6 +1,6 @@
 // ============================================
 // PlayerController - Movement, jump, death
-// with animated stick figure
+// with animated stick figure + touch support
 // ============================================
 
 class PlayerController {
@@ -17,6 +17,12 @@ class PlayerController {
         this.wasOnFloor = false;
         this.facingRight = true;
         this.currentAnim = '';
+
+        // Touch state
+        this.touchLeft = false;
+        this.touchRight = false;
+        this.touchJump = false;
+        this.touchJumpConsumed = false;
     }
 
     create(x, y) {
@@ -30,7 +36,7 @@ class PlayerController {
         this.sprite.body.setMaxVelocityY(PHYSICS.MAX_FALL_SPEED);
         this.sprite.setDepth(10);
 
-        // Input
+        // Keyboard input
         this.cursors = this.scene.input.keyboard.createCursorKeys();
         this.wasd = {
             up: this.scene.input.keyboard.addKey('W'),
@@ -44,6 +50,53 @@ class PlayerController {
         this.gravityFlipped = false;
         this.facingRight = true;
         this.playAnim('player_idle');
+
+        // Setup touch controls
+        this.setupTouchControls();
+    }
+
+    setupTouchControls() {
+        const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+        const controls = document.getElementById('touch-controls');
+        if (!controls) return;
+
+        if (isTouchDevice) {
+            controls.classList.add('visible');
+        }
+
+        const btnLeft = document.getElementById('btn-left');
+        const btnRight = document.getElementById('btn-right');
+        const btnJump = document.getElementById('btn-jump');
+
+        if (btnLeft) {
+            btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); this.touchLeft = true; btnLeft.classList.add('pressed'); }, { passive: false });
+            btnLeft.addEventListener('touchend', (e) => { e.preventDefault(); this.touchLeft = false; btnLeft.classList.remove('pressed'); }, { passive: false });
+            btnLeft.addEventListener('touchcancel', () => { this.touchLeft = false; btnLeft.classList.remove('pressed'); });
+        }
+
+        if (btnRight) {
+            btnRight.addEventListener('touchstart', (e) => { e.preventDefault(); this.touchRight = true; btnRight.classList.add('pressed'); }, { passive: false });
+            btnRight.addEventListener('touchend', (e) => { e.preventDefault(); this.touchRight = false; btnRight.classList.remove('pressed'); }, { passive: false });
+            btnRight.addEventListener('touchcancel', () => { this.touchRight = false; btnRight.classList.remove('pressed'); });
+        }
+
+        if (btnJump) {
+            btnJump.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                this.touchJump = true;
+                this.touchJumpConsumed = false;
+                btnJump.classList.add('pressed');
+            }, { passive: false });
+            btnJump.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                this.touchJump = false;
+                btnJump.classList.remove('pressed');
+            }, { passive: false });
+            btnJump.addEventListener('touchcancel', () => {
+                this.touchJump = false;
+                btnJump.classList.remove('pressed');
+            });
+        }
     }
 
     playAnim(key) {
@@ -65,9 +118,9 @@ class PlayerController {
             this.coyoteTimer -= delta;
         }
 
-        // Horizontal movement
-        const left = this.cursors.left.isDown || this.wasd.left.isDown;
-        const right = this.cursors.right.isDown || this.wasd.right.isDown;
+        // Horizontal movement (keyboard + touch)
+        const left = this.cursors.left.isDown || this.wasd.left.isDown || this.touchLeft;
+        const right = this.cursors.right.isDown || this.wasd.right.isDown || this.touchRight;
 
         if (left) {
             body.setVelocityX(-PHYSICS.PLAYER_SPEED);
@@ -83,12 +136,18 @@ class PlayerController {
         this.sprite.setFlipX(!this.facingRight);
         this.sprite.setFlipY(this.gravityFlipped);
 
-        // Jump
-        const jumpPressed = Phaser.Input.Keyboard.JustDown(this.cursors.up) ||
+        // Jump (keyboard)
+        const keyboardJump = Phaser.Input.Keyboard.JustDown(this.cursors.up) ||
                             Phaser.Input.Keyboard.JustDown(this.wasd.up) ||
                             Phaser.Input.Keyboard.JustDown(this.spaceBar);
 
-        if (jumpPressed) {
+        // Jump (touch - trigger once per press)
+        const touchJumpTriggered = this.touchJump && !this.touchJumpConsumed;
+        if (touchJumpTriggered) {
+            this.touchJumpConsumed = true;
+        }
+
+        if (keyboardJump || touchJumpTriggered) {
             this.jumpBufferTimer = 100;
         } else if (this.jumpBufferTimer > 0) {
             this.jumpBufferTimer -= delta;
@@ -167,5 +226,9 @@ class PlayerController {
             this.sprite.destroy();
             this.sprite = null;
         }
+        // Reset touch state
+        this.touchLeft = false;
+        this.touchRight = false;
+        this.touchJump = false;
     }
 }

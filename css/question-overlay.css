@@ -162,3 +162,51 @@
 .question-feedback.wrong {
     color: #CC3333;
 }
+
+/* ---- Mobile overrides ---- */
+@media (max-width: 500px) {
+    #question-overlay.active {
+        padding-top: 4px;
+    }
+
+    .question-panel {
+        padding: 8px 12px;
+        max-width: 98%;
+        width: 98%;
+    }
+
+    .question-text {
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .choices-container {
+        gap: 4px;
+        margin-bottom: 6px;
+    }
+
+    .choice-btn {
+        font-size: 11px;
+        padding: 7px 8px;
+    }
+
+    .text-input-container {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .text-input-field {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    .submit-btn {
+        font-size: 13px;
+        padding: 8px 12px;
+        width: 100%;
+    }
+
+    .question-feedback {
+        font-size: 13px;
+    }
+}

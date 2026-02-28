@@ -76,8 +76,12 @@ class MenuScene extends Phaser.Scene {
             }
         }
 
-        // Instructions
-        this.add.text(cx, GAME.HEIGHT - 40, 'WASD / Arrow Keys to move | Space to jump', {
+        // Instructions (detect touch device)
+        const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+        const instructions = isTouchDevice
+            ? 'Use on-screen buttons to move and jump'
+            : 'WASD / Arrow Keys to move | Space to jump';
+        this.add.text(cx, GAME.HEIGHT - 40, instructions, {
             fontFamily: 'Courier New',
             fontSize: '12px',
             color: '#8A8A8A',

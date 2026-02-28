@@ -100,6 +100,7 @@ class GameScene extends Phaser.Scene {
 
         // Listen for resume from question scene
         this.events.on('resume', (sys, data) => {
+            this.setTouchControlsVisible(true);
             if (data && data.result === 'correct') {
                 this.onQuestionCorrect();
             } else if (data && data.result === 'wrong') {
@@ -128,6 +129,9 @@ class GameScene extends Phaser.Scene {
         this.playerController.sprite.body.setAllowGravity(false);
         this.playerController.isDead = true;
 
+        // Hide touch controls during question
+        this.setTouchControlsVisible(false);
+
         this.time.delayedCall(500, () => {
             this.scene.pause();
             this.scene.launch('QuestionScene', {
@@ -154,7 +158,17 @@ class GameScene extends Phaser.Scene {
         });
     }
 
+    setTouchControlsVisible(visible) {
+        const controls = document.getElementById('touch-controls');
+        if (!controls) return;
+        const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+        if (isTouchDevice) {
+            controls.classList.toggle('visible', visible);
+        }
+    }
+
     shutdown() {
+        this.setTouchControlsVisible(false);
         this.trollManager.destroy();
         this.platformFactory.destroy();
         this.hazardFactory.destroy();
